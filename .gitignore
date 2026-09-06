@@ -1,0 +1,38 @@
+# Rust
+/target/
+**/target/
+Cargo.lock
+
+# Node / SvelteKit
+node_modules/
+.svelte-kit/
+build/
+.vite/
+dist/
+package-lock.json
+bun.lockb
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# Misc
+/tmp/
+coverage/
