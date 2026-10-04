@@ -1,4 +1,4 @@
-# docs — Индекс документации Indexium
+# docs - Индекс документации Indexium
 
 | Документ | Описание |
 |----------|----------|
@@ -12,12 +12,12 @@
 | [analytics.md](analytics.md) | bStats-аналог: SDK, ingestion, daily агрегаты, приватность |
 | [adr/003-search-engine.md](adr/003-search-engine.md) | ADR-003: Postgres FTS + pg_trgm вместо Meilisearch |
 | [adr/004-auth-strategy.md](adr/004-auth-strategy.md) | ADR-004: GitHub-only + PAT (+ Device Flow Phase 2) |
-| [adr/005-analytics.md](adr/005-analytics.md) | ADR-005: bStats аналог — Postgres + daily_salt |
+| [adr/005-analytics.md](adr/005-analytics.md) | ADR-005: bStats аналог - Postgres + daily_salt |
 
 ## Как добавлять доки
 
 - Новые ADR: `docs/adr/NNN-kebab-title.md` по шаблону ниже.
-- Диаграммы — Mermaid внутри markdown (рендерится в GitHub).
+- Диаграммы - Mermaid внутри markdown (рендерится в GitHub).
 
 ### Шаблон ADR
 

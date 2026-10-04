@@ -151,7 +151,7 @@ pub async fn github_webhook(
         return (StatusCode::ACCEPTED, body).into_response();
     }
 
-    // Stub for Redis Streams push — in future: XADD indexium:webhook ...
+    // Stub for Redis Streams push - in future: XADD indexium:webhook ...
     tracing::info!(delivery_id = %delivery_id, event = %event, "webhook accepted, push to redis (stub)");
 
     let body = Json(json!({ "status": "accepted", "delivery_id": delivery_id }));

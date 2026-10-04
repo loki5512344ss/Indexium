@@ -14,7 +14,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";    -- fuzzy search
 
 ## 2. Таблицы
 
-### `authors` — авторы (зеркало GitHub users)
+### `authors` - авторы (зеркало GitHub users)
 
 ```sql
 CREATE TABLE authors (
@@ -25,7 +25,7 @@ CREATE TABLE authors (
 );
 ```
 
-### `mods` — моды (один репозиторий = один мод на MVP)
+### `mods` - моды (один репозиторий = один мод на MVP)
 
 ```sql
 CREATE TABLE mods (
@@ -68,7 +68,7 @@ BEFORE INSERT OR UPDATE OF name, summary, description ON mods
 FOR EACH ROW EXECUTE FUNCTION mods_search_vector_update();
 ```
 
-### `mod_versions` — версии / релизы
+### `mod_versions` - версии / релизы
 
 ```sql
 CREATE TABLE mod_versions (
@@ -91,7 +91,7 @@ CREATE INDEX idx_versions_lookup ON mod_versions USING GIN (game_versions, loade
 CREATE INDEX idx_versions_sha ON mod_versions (file_sha256);
 ```
 
-### `webhook_deliveries` — идемпотентность webhook'ов (<50ms ответ)
+### `webhook_deliveries` - идемпотентность webhook'ов (<50ms ответ)
 
 ```sql
 CREATE TABLE webhook_deliveries (
@@ -107,11 +107,11 @@ CREATE TABLE webhook_deliveries (
 -- В handler: если affected_rows == 0 → 409 Already Processed, иначе push в Redis Streams.
 ```
 
-> **Почему так:** Ingestion API должен ответить `202` за <50ms. Сначала `INSERT ... ON CONFLICT DO NOTHING` в `webhook_deliveries`, только потом `XADD` в Redis. Если `delivery_id` уже есть — сразу `409` без очереди.
+> **Почему так:** Ingestion API должен ответить `202` за <50ms. Сначала `INSERT ... ON CONFLICT DO NOTHING` в `webhook_deliveries`, только потом `XADD` в Redis. Если `delivery_id` уже есть - сразу `409` без очереди.
 
-### `mod_authors` — M2M авторы/контрибьюторы
+### `mod_authors` - M2M авторы/контрибьюторы
 
-На MVP `mods.author_github_id` достаточно (1 репо = 1 owner). Для организаций и соавторов — нормализуем сразу, чтобы не мигрировать болезненно:
+На MVP `mods.author_github_id` достаточно (1 репо = 1 owner). Для организаций и соавторов - нормализуем сразу, чтобы не мигрировать болезненно:
 
 ```sql
 CREATE TABLE mod_authors (
@@ -129,20 +129,20 @@ CREATE INDEX idx_mod_authors_github ON mod_authors (github_id);
 
 > **MVP стратегия:** оставляем `mods.author_github_id` (как сейчас в `migrations/20260906000000_init_schema.sql`) для простых запросов, но добавляем `mod_authors` когда появится первый кейс организации. В `GET /mods/:slug` отдаём `authors: [{login, role}]` вместо одиночного `author`.
 
-### `mod_versions.file_size` — откуда берётся
+### `mod_versions.file_size` - откуда берётся
 
 В `api-spec.md` поле `file_size` возвращается клиентам. Заполняется воркером из HTTP-заголовка:
 
 ```sql
--- уже в mod_versions: file_size BIGINT — bytes из Content-Length
+-- уже в mod_versions: file_size BIGINT - bytes из Content-Length
 ```
 
 Алгоритм воркера (`jar_parser.rs`):
 1. `HEAD download_url` → `Content-Length` + `Accept-Ranges: bytes`.
-2. Если `Content-Length` отсутствует — fallback на `GET` с `Range: bytes=0-0` и парсинг `Content-Range`.
+2. Если `Content-Length` отсутствует - fallback на `GET` с `Range: bytes=0-0` и парсинг `Content-Range`.
 3. Значение пишется в `mod_versions.file_size` при `INSERT`.
 
-> GitHub CDN (`objects.githubusercontent.com`) всегда отдаёт `Content-Length` и поддерживает `Range` для release assets — проверено для `.jar` до 50MB.
+> GitHub CDN (`objects.githubusercontent.com`) всегда отдаёт `Content-Length` и поддерживает `Range` для release assets - проверено для `.jar` до 50MB.
 
 ### `dependencies` (опционально, нормализованная)
 
@@ -158,7 +158,7 @@ CREATE TABLE mod_dependencies (
 );
 ```
 
-## 3. Телеметрия — аналог bStats (см. docs/analytics.md)
+## 3. Телеметрия - аналог bStats (см. docs/analytics.md)
 
 ```sql
 -- Полуагрегат: один пинг = одна строка, TTL 30 дней (DELETE via cron)
@@ -176,7 +176,7 @@ CREATE TABLE mod_telemetry_pings (
 CREATE INDEX idx_telemetry_lookup ON mod_telemetry_pings (mod_id, pinged_at DESC);
 CREATE INDEX idx_telemetry_hash ON mod_telemetry_pings (server_hash, pinged_at);
 
--- Суточный агрегат — хранится навсегда
+-- Суточный агрегат - хранится навсегда
 CREATE TABLE mod_daily_stats (
     mod_id UUID NOT NULL REFERENCES mods(id) ON DELETE CASCADE,
     date DATE NOT NULL,
@@ -191,13 +191,13 @@ CREATE TABLE analytics_salts (
     date DATE PRIMARY KEY,
     salt CHAR(64) NOT NULL
 );
--- Хеш: server_hash = sha256(server_uuid || salt_for_today) — позволяет считать уникальные за день, но не трекать сквозь дни.
+-- Хеш: server_hash = sha256(server_uuid || salt_for_today) - позволяет считать уникальные за день, но не трекать сквозь дни.
 -- Rate limit: Redis SET server_hash:mod_id NX EX 900 (1 пинг / 15 мин)
 -- TTL: DELETE FROM mod_telemetry_pings WHERE pinged_at < NOW() - INTERVAL '30 days' (cron hourly)
 -- Агрегация: кроном раз в час INSERT INTO mod_daily_stats ... ON CONFLICT DO UPDATE COUNT(DISTINCT server_hash)
 ```
 
-> Postgres хватает до ~10M пингов/мес. При росте — `SELECT create_hypertable('mod_telemetry_pings','pinged_at')` (TimescaleDB) или ClickHouse без смены схемы.
+> Postgres хватает до ~10M пингов/мес. При росте - `SELECT create_hypertable('mod_telemetry_pings','pinged_at')` (TimescaleDB) или ClickHouse без смены схемы.
 
 ## 4. Пример запросов
 
@@ -241,7 +241,7 @@ migrations/
 
 ## 6. Сиды
 
-Для дев-окружения: `migrations/seeds/dev.sql` — 5 фейковых модов + версии, чтобы фронт сразу имел данные.
+Для дев-окружения: `migrations/seeds/dev.sql` - 5 фейковых модов + версии, чтобы фронт сразу имел данные.
 
 ## 7. Будущие расширения
 

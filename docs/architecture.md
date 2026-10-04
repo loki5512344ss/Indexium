@@ -1,7 +1,7 @@
-# Архитектура Indexium — Асинхронный событийный индексатор
+# Архитектура Indexium - Асинхронный событийный индексатор
 
 > Цель: сделать сервис максимально лёгким, дешёвым в обслуживании и устойчивым к ограничениям GitHub.
-> Принцип: бэкенд **не хранит** тяжёлые файлы — артефакты отдаются с GitHub Releases CDN, мы валидируем, индексируем метаданные и выдаём быстрые JSON-ответы.
+> Принцип: бэкенд **не хранит** тяжёлые файлы - артефакты отдаются с GitHub Releases CDN, мы валидируем, индексируем метаданные и выдаём быстрые JSON-ответы.
 
 ---
 
@@ -37,9 +37,9 @@
 ```
 
 ### Потоки данных
-1. **Ingestion** — GitHub шлёт webhook → Ingestion API валидирует HMAC → кладёт job в очередь → отвечает `202`.
-2. **Indexing** — Worker читает job → делает `Range Request` к `.jar` → парсит манифест → пишет в Postgres → инвалидирует кэш.
-3. **Serving** — Лаунчер / Web UI дергает `GET /api/v1/mods` → читаем Redis → miss → Postgres FTS → кэшируем 60s → отдаём JSON.
+1. **Ingestion** - GitHub шлёт webhook → Ingestion API валидирует HMAC → кладёт job в очередь → отвечает `202`.
+2. **Indexing** - Worker читает job → делает `Range Request` к `.jar` → парсит манифест → пишет в Postgres → инвалидирует кэш.
+3. **Serving** - Лаунчер / Web UI дергает `GET /api/v1/mods` → читаем Redis → miss → Postgres FTS → кэшируем 60s → отдаём JSON.
 
 ---
 
@@ -47,14 +47,14 @@
 
 | Слой | Технология | Почему именно это? |
 | --- | --- | --- |
-| **Backend Core** | **Rust (Axum)** | Минимальный memory footprint, высокий throughput, быстрый async I/O при парсинге. Альтернатива Go (Fiber) — допустима на Phase 2. |
+| **Backend Core** | **Rust (Axum)** | Минимальный memory footprint, высокий throughput, быстрый async I/O при парсинге. Альтернатива Go (Fiber) - допустима на Phase 2. |
 | **Main Database** | **PostgreSQL** | Нативный FTS, `JSONB` для зависимостей, `pg_trgm` для fuzzy, `pgvector` опционально для семантики. |
 | **Cache & Queue** | **Redis / Valkey** | Одновременно брокер очередей (Streams/PubSub) и L2-кэш популярных эндпоинтов. |
 | **Worker Engine** | **Rust Background Worker (tokio)** | Потребляет webhook-события, скачивает только zip-header stream, валидирует байткод. |
 | **Auth & Security** | **GitHub App / OAuth 2.0** | Вход только через GitHub, без локальных паролей. |
 | **Frontend** | **SvelteKit + TypeScript** | SSR, маленький бандл, быстрый dev. |
 
-> Обоснование против Elasticsearch/Meilisearch на старте: `to_tsvector` + `pg_trgm` переваривают десятки тысяч модов с <5ms без отдельного кластера. Миграция на внешний поиск — только если FTS упрётся.
+> Обоснование против Elasticsearch/Meilisearch на старте: `to_tsvector` + `pg_trgm` переваривают десятки тысяч модов с <5ms без отдельного кластера. Миграция на внешний поиск - только если FTS упрётся.
 
 ---
 
@@ -68,9 +68,9 @@
 ### 3.2 Обработка webhook (Ingestion & Job Dispatch)
 1. GitHub шлёт `release.published`.
 2. **Ingestion API** валидирует `X-Hub-Signature-256` (HMAC SHA-256 с `WEBHOOK_SECRET`), проверяет идемпотентность по `X-GitHub-Delivery`.
-3. Кладёт задачу в Redis Queue, отвечает `202 Accepted` за <50ms (чтобы не висеть по таймауту GitHub — 10s).
+3. Кладёт задачу в Redis Queue, отвечает `202 Accepted` за <50ms (чтобы не висеть по таймауту GitHub - 10s).
 
-### 3.3 Работа воркера-индексатора (Worker Execution) — детальный алгоритм `jar_parser.rs`
+### 3.3 Работа воркера-индексатора (Worker Execution) - детальный алгоритм `jar_parser.rs`
 
 > Цель: не скачивать весь `.jar` (может быть 20–50MB), а прочитать только нужный манифест через 2–3 Range-запроса.
 
@@ -102,15 +102,15 @@ download_url = "https://github.com/owner/repo/releases/download/v1.2.3/mod-1.2.3
 ```
 
 **Детали реализации:**
-1. `HEAD` — обязателен, чтобы получить `Content-Length` и убедиться `Accept-Ranges: bytes`. Таймаут 5s, retry 2.
-2. Последние 64KB достаточно для EOCD даже для jar с 10k файлов (EOCD в конце). Если не найден — fallback к последним 128KB.
+1. `HEAD` - обязателен, чтобы получить `Content-Length` и убедиться `Accept-Ranges: bytes`. Таймаут 5s, retry 2.
+2. Последние 64KB достаточно для EOCD даже для jar с 10k файлов (EOCD в конце). Если не найден - fallback к последним 128KB.
 3. Central Directory читается одним запросом (обычно 5–30KB). Парсим `central_dir_offset/size` из EOCD.
-4. Манифест — 4-й запрос только если нужен (часто 1–3KB). Иконка — опционально 5-й запрос, кэшируется и отдаётся через `GET /mods/:slug/icon`.
-5. Все `GET` — `reqwest` с `header("Range", ...)`, проверка `206 Partial Content`, иначе fallback к полному скачиванию с лимитом 10MB.
+4. Манифест - 4-й запрос только если нужен (часто 1–3KB). Иконка - опционально 5-й запрос, кэшируется и отдаётся через `GET /mods/:slug/icon`.
+5. Все `GET` - `reqwest` с `header("Range", ...)`, проверка `206 Partial Content`, иначе fallback к полному скачиванию с лимитом 10MB.
 
 **Ошибки:** `412` если `Accept-Ranges` != bytes → full download; `404` на Range → retry без Range; повреждённый ZIP → помечаем `suspicious` и DLQ.
 
-Код: `indexium-backend/src/worker/jar_parser.rs` — чистые функции `find_eocd()`, `parse_central_dir()`, `fetch_manifest()` без I/O в тестах.
+Код: `indexium-backend/src/worker/jar_parser.rs` - чистые функции `find_eocd()`, `parse_central_dir()`, `fetch_manifest()` без I/O в тестах.
 
 ### 3.4 Агрегация и индексация (Storage & Cache Invalidation)
 1. Сохраняет версию в `mod_versions` (см. `database-schema.md`).
@@ -122,8 +122,8 @@ download_url = "https://github.com/owner/repo/releases/download/v1.2.3/mod-1.2.3
 ## 4. Обход ключевых ограничений (Edge Cases)
 
 ### GitHub Rate Limits
-- Запросы воркеров — от имени **GitHub App Installs** (5k–12.5k RPH на инсталл vs 60 RPH анонимных).
-- Скачивание не проксируем — выдаём клиентам прямые CDN-ссылки, трафик не идёт через нас.
+- Запросы воркеров - от имени **GitHub App Installs** (5k–12.5k RPH на инсталл vs 60 RPH анонимных).
+- Скачивание не проксируем - выдаём клиентам прямые CDN-ссылки, трафик не идёт через нас.
 
 ### Безопасность (Malware Protection)
 - Сверка `SHA-256` ассета с `.sha256` если есть.
@@ -216,4 +216,4 @@ CREATE INDEX idx_versions_lookup ON mod_versions USING GIN (game_versions, loade
                       --> [SvelteKit :5173] (SSR, fetch API)
 ```
 
-Все сервисы — `docker compose` локально, один VPS в проде.
+Все сервисы - `docker compose` локально, один VPS в проде.

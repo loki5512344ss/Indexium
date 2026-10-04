@@ -1,0 +1,123 @@
+/* Indexium Moss Stone - fork of Nocturne. Accent moss #4ADE80 on deep forest #0D1410 */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --color-bg: #0D1410;
+  --color-surface: #1A2420;
+  --color-text: #E8E4D9;
+  --color-accent: #4ADE80;
+  --color-accent-2: #86EFAC;
+  --color-divider: color-mix(in srgb, #E8E4D9 14%, transparent);
+
+  --color-neutral-100: #F2F0E8;
+  --color-neutral-200: #E8E4D9;
+  --color-neutral-300: #D5D0C2;
+  --color-neutral-400: #B8B3A3;
+  --color-neutral-500: #9A9590;
+  --color-neutral-600: #7A7572;
+  --color-neutral-700: #5C5A58;
+  --color-neutral-800: #2A2E2B;
+  --color-neutral-900: #1A2420;
+
+  --color-accent-100: #F0FDF4;
+  --color-accent-200: #DCFCE7;
+  --color-accent-300: #BBF7D0;
+  --color-accent-400: #86EFAC;
+  --color-accent-500: #4ADE80;
+  --color-accent-600: #22C55E;
+  --color-accent-700: #15803D;
+  --color-accent-800: #14532D;
+  --color-accent-900: #0D1F15;
+
+  --color-accent-2-100: #FEF3C7;
+  --color-accent-2-200: #FDE68A;
+  --color-accent-2-300: #FCD34D;
+  --color-accent-2-400: #F59E0B;
+  --color-accent-2-500: #D97706;
+  --color-accent-2-600: #92400E;
+  --color-accent-2-700: #78350F;
+  --color-accent-2-800: #451A03;
+  --color-accent-2-900: #1C0A00;
+
+  --color-section: #14261C;
+  --color-section-glow: #1B3A28;
+  --color-section-ghost: #2A4A36;
+
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-heading-weight: 500;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --space-1: 2.8px;
+  --space-2: 5.6px;
+  --space-3: 8.4px;
+  --space-4: 11.2px;
+  --space-6: 16.8px;
+  --space-8: 22.4px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 0 0 1px #2A2E2B;
+  --shadow-md: 0 0 0 1px #3A3F3B, 0 6px 18px rgba(0,0,0,0.6);
+  --shadow-lg: 0 0 0 1px #5C6140, 0 16px 40px rgba(0,0,0,0.7);
+}
+
+body { background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+h1,h2,h3,h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
+.lighten{mix-blend-mode:lighten;background-color:transparent}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
+h1 { font-size: 42px; } h2 { font-size: 32px; } h3 { font-size: 25px; }
+p { margin: 0 0 var(--space-3); }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+.text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+
+.hr { height: 1px; border: 0; margin: var(--space-4) 0; background: linear-gradient(to right, transparent, var(--color-divider) 48px, var(--color-divider) calc(100% - 48px), transparent); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; text-decoration: none; font-family: var(--font-heading); font-weight: 500; font-size: 14px; line-height: 1.2; color: var(--color-text); background: transparent; border: 1px solid transparent; padding: var(--space-2) calc(var(--space-3) * 1.2); border-radius: var(--radius-md); }
+.btn-primary { color: var(--color-bg); background: var(--color-accent); border-color: var(--color-accent); font-weight: 600; }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 88%, white); }
+.btn-secondary { border-color: var(--color-divider); }
+.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.btn-ghost { color: var(--color-accent); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+
+.input { width: 100%; min-height: 36px; padding: 6px 10px; font: inherit; font-size: 14px; color: var(--color-text); caret-color: var(--color-accent); background: var(--color-surface); border: 1px solid var(--color-divider); border-radius: var(--radius-md); }
+.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+.seg { display: inline-flex; overflow: hidden; border: 1px solid var(--color-divider); border-radius: var(--radius-md); }
+.seg-opt { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+.seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
+.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.seg-opt input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.radio input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.radio .dot { width: 16px; height: 16px; flex: none; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--color-accent) 30%, var(--color-divider)); background: var(--color-surface); transition: border-color .15s, background .15s; }
+.radio:hover .dot { border-color: var(--color-accent); }
+.radio input:checked + .dot { border-color: var(--color-accent); background: var(--color-accent); box-shadow: inset 0 0 0 4px var(--color-bg); }
+.radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.card { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface); }
+.card-title { font-family: var(--font-heading); font-weight: 500; font-size: 17px; line-height: 1.2; }
+.card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+.card-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: color-mix(in srgb, var(--color-text) 50%, transparent); }
+.elev-sm { box-shadow: var(--shadow-sm); } .elev-md { box-shadow: var(--shadow-md); } .elev-lg { box-shadow: var(--shadow-lg); }
+
+.tag { display: inline-flex; align-items: center; font-size: 11px; letter-spacing: 0.02em; padding: 3px 10px; border-radius: calc(var(--radius-md) * 0.75); }
+.tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
+.tag-neutral { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+
+.nav { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-4); }
+.nav-brand { font-family: var(--font-heading); font-weight: 600; font-size: 18px; margin-right: auto; letter-spacing: -0.02em; }
+.nav a { color: inherit; text-decoration: none; font-size: 14px; opacity: 0.85; }
+.nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); opacity: 1; }
+
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+@keyframes shimmer{0%{background-position:-300px 0;}100%{background-position:300px 0;}}
+@keyframes blink{0%,50%{opacity:1;}50.01%,100%{opacity:0;}}
+@keyframes pingDot{75%,100%{transform:scale(2.2);opacity:0;}}

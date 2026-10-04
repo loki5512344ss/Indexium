@@ -119,7 +119,7 @@ pub async fn list_collections(State(state): State<AppState>) -> impl IntoRespons
     }
 }
 
-/// POST /api/v1/collections — auth stub: без проверки токена, просто 201
+/// POST /api/v1/collections - auth stub: без проверки токена, просто 201
 pub async fn create_collection(
     State(state): State<AppState>,
     Json(req): Json<CreateCollectionRequest>,

@@ -37,6 +37,7 @@ pub struct ModListItem {
     pub game_versions: Vec<String>, pub loaders: Vec<String>,
     pub latest_version: Option<String>, pub download_url: Option<String>,
     pub updated_at: DateTime<Utc>,
+    pub stars_count: i64,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Pagination { pub page: i64, pub limit: i64, pub total: i64, pub pages: i64 }
@@ -57,6 +58,7 @@ pub struct ModDetailResponse {
     pub description: Option<String>, pub github_repo: String,
     pub author: AuthorDto, pub icon_url: Option<String>, pub verified: bool,
     pub versions: Vec<VersionDto>, pub updated_at: DateTime<Utc>,
+    pub stars_count: i64,
 }
 
 pub async fn list_mods(State(state): State<AppState>, Query(p): Query<ModSearchParams>) -> impl IntoResponse {
@@ -92,6 +94,7 @@ pub async fn list_mods(State(state): State<AppState>, Query(p): Query<ModSearchP
         slug: r.slug, name: r.name, summary: r.summary, author: r.author, icon_url: r.icon_url,
         game_versions: r.game_versions.unwrap_or_default(), loaders: r.loaders.unwrap_or_default(),
         latest_version: r.latest_version, download_url: r.download_url, updated_at: r.updated_at,
+        stars_count: r.stars_count,
     }).collect::<Vec<_>>();
     let pages = if total == 0 { 0 } else { (total + limit - 1) / limit };
     let body = ModListResponse { data, pagination: Pagination { page, limit, total, pages } };
@@ -127,6 +130,7 @@ pub async fn get_mod(State(state): State<AppState>, Path(slug): Path<String>) ->
         github_repo: format!("{}/{}", m.owner, m.repo),
         author: AuthorDto { login: m.owner, avatar_url: None },
         icon_url: m.icon_url, verified: false, versions: versions_dto, updated_at: m.updated_at,
+        stars_count: m.stars_count,
     };
     let mut res = (StatusCode::OK, Json(resp)).into_response();
     res.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("public, max-age=60"));
@@ -145,7 +149,7 @@ mod tests {
                 summary: Some("Extra".into()), author: "flashy".into(),
                 icon_url: None, game_versions: vec!["1.20.1".into()], loaders: vec!["fabric".into()],
                 latest_version: Some("1.2.3".into()), download_url: Some("https://example.com/mod.jar".into()),
-                updated_at: Utc::now(),
+                updated_at: Utc::now(), stars_count: 5,
             }],
             pagination: Pagination { page: 1, limit: 20, total: 1, pages: 1 },
         };
@@ -161,7 +165,7 @@ mod tests {
                 version_number: "1.2.3".into(), game_versions: vec!["1.20.1".into()], loaders: vec!["fabric".into()],
                 download_url: "https://example.com/mod.jar".into(), file_sha256: "abc".into(), file_size: Some(123), published_at: Utc::now(),
             }],
-            updated_at: Utc::now(),
+            updated_at: Utc::now(), stars_count: 5,
         };
         let jd = serde_json::to_value(&detail).unwrap();
         assert_eq!(jd["versions"][0]["version_number"], "1.2.3");

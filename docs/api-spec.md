@@ -1,8 +1,8 @@
-# Public REST API — Indexium v1
+# Public REST API - Indexium v1
 
 Base URL: `https://api.indexium.example.com/api/v1` (локально `http://localhost:3000/api/v1`)
 
-Все ответы — `application/json`. Пагинация — `page`/`limit` (MVP) → cursor позже. Кэш — `Cache-Control: public, max-age=60`, `ETag`.
+Все ответы - `application/json`. Пагинация - `page`/`limit` (MVP) → cursor позже. Кэш - `Cache-Control: public, max-age=60`, `ETag`.
 
 ---
 
@@ -30,12 +30,12 @@ Headers:
 
 Body: raw JSON от GitHub.
 
-**202** — принято в очередь
+**202** - принято в очередь
 ```json
 { "status": "accepted", "delivery_id": "..." }
 ```
-**401** — неверная подпись
-**409** — уже обработано (идемпотентность)
+**401** - неверная подпись
+**409** - уже обработано (идемпотентность)
 
 Логика: HMAC проверка → дедуп по `delivery_id` → push в Redis Streams → 202.
 
@@ -105,18 +105,18 @@ Query params:
   ]
 }
 ```
-**404** — `{"error":"mod_not_found"}`
+**404** - `{"error":"mod_not_found"}`
 
 ### `GET /mods/:slug/icon`
 
 Отдаёт иконку мода. Воркер при индексации извлекает `assets/<modid>/icon.png` (или `icon` из `fabric.mod.json` → путь внутри jar) → сохраняет в кэш/проксирует.
 
-- **200** — `image/png` / `image/webp` с `Cache-Control: public, max-age=86400`, `ETag`. Если иконки нет → `302` на `raw.githubusercontent.com` fallback или дефолтная заглушка.
-- **404** — мод не найден.
+- **200** - `image/png` / `image/webp` с `Cache-Control: public, max-age=86400`, `ETag`. Если иконки нет → `302` на `raw.githubusercontent.com` fallback или дефолтная заглушка.
+- **404** - мод не найден.
 
-> Альтернатива на MVP: не хранить иконку у себя, а отдавать `icon_url` как прямую ссылку `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/src/main/resources/assets/...`. Эндпоинт `/icon` тогда — 302 редирект + кэш заголовков.
+> Альтернатива на MVP: не хранить иконку у себя, а отдавать `icon_url` как прямую ссылку `https://raw.githubusercontent.com/<owner>/<repo>/<branch>/src/main/resources/assets/...`. Эндпоинт `/icon` тогда - 302 редирект + кэш заголовков.
 
-### `POST /mods/resolve` — пакетный резолв для лаунчеров
+### `POST /mods/resolve` - пакетный резолв для лаунчеров
 
 Принимает список модов + окружение, возвращает дерево прямых скачиваний и зависимостей (для Prism / Modrinth-compatible клиентов).
 
@@ -159,7 +159,7 @@ Query params:
 
 - `version: "latest"` → резолвит последнюю совместимую с `game_version` + `loader`.
 - Транзитивные зависимости резолвятся рекурсивно (BFS, max depth 20, защита от циклов).
-- **422** — несовместимая комбинация `game_version`/`loader`.
+- **422** - несовместимая комбинация `game_version`/`loader`.
 - Кэшируется по ключу `resolve:gv:loader:hash(mods)` TTL 60s.
 
 ### `GET /mods/:slug/versions/:version`
@@ -193,9 +193,9 @@ Body:
 
 Логика: проверить что токен имеет доступ к репо → fetch `fabric.mod.json` из default branch → создать запись `mods` → повесить webhook.
 
-**201** — создан
-**409** — уже импортирован
-**422** — манифест не найден
+**201** - создан
+**409** - уже импортирован
+**422** - манифест не найден
 
 ---
 
@@ -204,14 +204,14 @@ Body:
 ### `GET /auth/github` → 302 redirect на GitHub OAuth
 ### `GET /auth/github/callback?code=...` → обмен code→token, установка httpOnly cookie / JWT
 
-### `POST /auth/tokens` (auth) — PAT creation
+### `POST /auth/tokens` (auth) - PAT creation
 Body: `{ "name": "ci-token", "scopes": ["read:mods","write:mods"], "expires_in_days": 30 }` → `201 { token: "idx_...", id, expires_at }` (токен показывается 1 раз, храним hash). `Authorization: Bearer idx_...` для API.
 
-### `GET /auth/tokens` / `DELETE /auth/tokens/:id` — список/отзыв.
+### `GET /auth/tokens` / `DELETE /auth/tokens/:id` - список/отзыв.
 
 ### Device Flow (Phase 2, RFC 8628)
 - `POST /oauth/device/code` → `{ device_code, user_code: "ABCD-1234", verification_uri: "https://indexium.example.com/activate", expires_in: 600 }`
-- `GET /activate` (frontend) — ввод `user_code` → consent → `POST /oauth/device/verify { user_code }`
+- `GET /activate` (frontend) - ввод `user_code` → consent → `POST /oauth/device/verify { user_code }`
 - `POST /oauth/token` grant_type=`urn:ietf:params:oauth:grant-type:device_code` → `{ access_token, refresh_token }`
 - Лаунчер поллит `/oauth/token` до получения токена.
 
@@ -219,16 +219,16 @@ Body: `{ "name": "ci-token", "scopes": ["read:mods","write:mods"], "expires_in_d
 
 ## Profiles & Social
 
-### `GET /u/:login` / `GET /org/:login` — публичный профиль (кэш 60s, ISR)
-### `POST /mods/:slug/star` / `DELETE /mods/:slug/star` — звезда (auth)
-### `POST /u/:login/follow` / `DELETE /u/:login/follow` — подписка на автора с опционально `?game_version=1.20.1&loader=fabric`
+### `GET /u/:login` / `GET /org/:login` - публичный профиль (кэш 60s, ISR)
+### `POST /mods/:slug/star` / `DELETE /mods/:slug/star` - звезда (auth)
+### `POST /u/:login/follow` / `DELETE /u/:login/follow` - подписка на автора с опционально `?game_version=1.20.1&loader=fabric`
 ### `GET /collections` / `POST /collections` (auth, body: `{ title, description, mods: [{slug, version}] }`)
 ### `GET /collections/:slug` / `GET /collections/:slug/export?format=prism|packwiz`
-### `GET /v1/badges/:slug/downloads.svg` / `GET /v1/badges/:slug/version.svg` — SVG виджет для README (public, кэш 1h)
+### `GET /v1/badges/:slug/downloads.svg` / `GET /v1/badges/:slug/version.svg` - SVG виджет для README (public, кэш 1h)
 
 ## Analytics (bStats аналог, см. docs/analytics.md)
 
-### `POST /api/v1/analytics/submit` — пинг от мода (gzip опционально)
+### `POST /api/v1/analytics/submit` - пинг от мода (gzip опционально)
 Headers: `Content-Type: application/json`, `Content-Encoding: gzip` (optional)
 Body:
 ```json
@@ -246,7 +246,7 @@ Body:
 }
 ```
 - Валидация: `mod_slug` exists, allow-list версий/лоадеров, `custom_charts` ≤5 ключей.
-- Анонимизация: `server_hash = sha256(server_uuid + daily_salt)` — IP не храним.
+- Анонимизация: `server_hash = sha256(server_uuid + daily_salt)` - IP не храним.
 - Rate limit: 1 пинг / 15 мин per `server_hash+mod_slug` (Redis `SET NX EX 900`) → `429`.
 - Opt-Out: respect `-Dindexium.analytics.disable=true` на клиенте.
 - **200** `{ "status": "ok" }` **400** validation **429** rate_limited
@@ -272,13 +272,13 @@ Public, кэш `public, max-age=300`.
 ```
 **404** mod_not_found. Источник: `mod_daily_stats`.
 
-### `GET /api/v1/badges/:slug/servers.svg` — бейдж активных серверов (как downloads.svg, кэш 1h)
+### `GET /api/v1/badges/:slug/servers.svg` - бейдж активных серверов (как downloads.svg, кэш 1h)
 SVG `Active Servers: 1.2k` из `mod_daily_stats` за вчера.
 
 ## Sponsors & Badges
 
 - `GET /u/:login` отдаёт `sponsors: { github, patreon, kofi, bmc }` и `badges: ["early_adopter","verified"]`
-- Бейджи выдаются воркером (`badges` таблица), SVG — динамически.
+- Бейджи выдаются воркером (`badges` таблица), SVG - динамически.
 
 ---
 
@@ -315,4 +315,4 @@ SVG `Active Servers: 1.2k` из `mod_daily_stats` за вчера.
 
 ## OpenAPI
 
-Спека будет жить в `indexium-backend/openapi.yaml` (генерировать из Axum через `utoipa` когда созреет). На MVP — этот markdown как источник правды.
+Спека будет жить в `indexium-backend/openapi.yaml` (генерировать из Axum через `utoipa` когда созреет). На MVP - этот markdown как источник правды.

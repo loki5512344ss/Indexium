@@ -24,10 +24,10 @@
 
 ## Альтернативы (отклонены на MVP)
 
-- **Meilisearch** — отличный typo-tolerance, но +1 сервис, нужен отдельный деплой и синк.
-- **Elasticsearch / OpenSearch** — оверхед по RAM/диску, нужен кластер даже для малого объёма.
-- **SQLite FTS** — не подходит, уже Postgres как основной.
+- **Meilisearch** - отличный typo-tolerance, но +1 сервис, нужен отдельный деплой и синк.
+- **Elasticsearch / OpenSearch** - оверхед по RAM/диску, нужен кластер даже для малого объёма.
+- **SQLite FTS** - не подходит, уже Postgres как основной.
 
 ## Ссылки
-- `docs/database-schema.md` — секция 2 (триггер `mods_search_vector_update`), секция 3 (примеры FTS + fuzzy).
-- `docs/architecture.md` — секция 4 (Поиск без Elasticsearch).
+- `docs/database-schema.md` - секция 2 (триггер `mods_search_vector_update`), секция 3 (примеры FTS + fuzzy).
+- `docs/architecture.md` - секция 4 (Поиск без Elasticsearch).

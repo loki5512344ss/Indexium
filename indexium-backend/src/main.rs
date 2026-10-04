@@ -65,29 +65,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cors = CorsLayer::new()
         .allow_origin("http://localhost:5173".parse::<HeaderValue>()?)
-        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers([axum::http::header::CONTENT_TYPE]);
+        .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::OPTIONS])
+        .allow_headers([axum::http::header::CONTENT_TYPE, axum::http::header::HeaderName::from_static("x-github-id")]);
 
     let state = AppState { db: pool };
 
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/api/v1/mods", get(api::mods::list_mods))
-        .route("/api/v1/mods/:slug", get(api::mods::get_mod))
+        .route("/api/v1/mods/{slug}", get(api::mods::get_mod))
+        .route("/api/v1/mods/{slug}/stars", get(api::stars::get_stars))
+        .route("/api/v1/mods/{slug}/star", post(api::stars::star_mod).delete(api::stars::unstar_mod))
         .route("/api/v1/collections", get(api::collections::list_collections).post(api::collections::create_collection))
-        .route("/api/v1/collections/:slug", get(api::collections::get_collection))
-        .route("/api/v1/collections/:slug/export", get(api::collections::export_collection))
+        .route("/api/v1/collections/{slug}", get(api::collections::get_collection))
+        .route("/api/v1/collections/{slug}/export", get(api::collections::export_collection))
         .route(
-            "/api/v1/badges/:slug/downloads.svg",
+            "/api/v1/badges/{slug}/downloads.svg",
             get(api::badges::get_downloads_badge),
         )
         .route(
-            "/api/v1/badges/:slug/servers.svg",
+            "/api/v1/badges/{slug}/servers.svg",
             get(api::badges::get_servers_badge),
         )
         .route(
             "/api/v1/webhooks/github",
             post(api::webhooks::github_webhook),
+        )
+        .route("/api/v1/auth/github", get(api::auth::github_login))
+        .route("/api/v1/auth/github/callback", get(api::auth::github_callback))
+        .route("/api/v1/auth/me", get(api::auth::me))
+        .route("/api/v1/auth/logout", post(api::auth::logout))
+        .route(
+            "/api/v1/analytics/submit",
+            post(api::analytics::submit),
+        )
+        .route(
+            "/api/v1/mods/{slug}/analytics",
+            get(api::analytics::get_analytics),
         )
         .layer(TraceLayer::new_for_http())
         .layer(cors)

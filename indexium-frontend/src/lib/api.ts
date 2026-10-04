@@ -98,6 +98,33 @@ export interface AnalyticsResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Collections
+// ---------------------------------------------------------------------------
+
+export interface CollectionMod {
+  slug: string;
+  version?: string | null;
+}
+
+export interface Collection {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  mods: CollectionMod[];
+  author_id: number | null;
+  created_at: string;
+}
+
+export interface CreateCollectionPayload {
+  slug: string;
+  title: string;
+  description?: string | null;
+  mods?: CollectionMod[];
+  author_id?: number | null;
+}
+
+// ---------------------------------------------------------------------------
 // Params
 // ---------------------------------------------------------------------------
 
@@ -172,6 +199,33 @@ export async function fetchAnalytics(
 ): Promise<AnalyticsResponse> {
   const qs = buildQuery({ range });
   return request<AnalyticsResponse>(`/api/v1/mods/${encodeURIComponent(slug)}/analytics${qs}`);
+}
+
+export async function fetchCollections(): Promise<Collection[]> {
+  return request<Collection[]>('/api/v1/collections');
+}
+
+export async function fetchCollection(slug: string): Promise<Collection> {
+  return request<Collection>(`/api/v1/collections/${encodeURIComponent(slug)}`);
+}
+
+export async function createCollection(payload: CreateCollectionPayload): Promise<Collection> {
+  return request<Collection>('/api/v1/collections', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function fetchCollectionExport(
+  slug: string,
+  format: 'prism' | string = 'prism'
+): Promise<unknown> {
+  const qs = buildQuery({ format });
+  return request<unknown>(`/api/v1/collections/${encodeURIComponent(slug)}/export${qs}`);
+}
+
+export function collectionExportUrl(slug: string, format: 'prism' | string = 'prism'): string {
+  return `${BASE}/api/v1/collections/${encodeURIComponent(slug)}/export?format=${encodeURIComponent(format)}`;
 }
 
 /** Stub for analytics ingestion (mod SDK → POST /analytics/submit). */

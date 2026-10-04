@@ -19,6 +19,7 @@ pub struct ModListRow {
     pub game_versions: Option<Vec<String>>,
     pub loaders: Option<Vec<String>>,
     pub download_url: Option<String>,
+    pub stars_count: i64,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -32,6 +33,7 @@ pub struct ModRow {
     pub icon_url: Option<String>,
     pub updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
+    pub stars_count: i64,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -100,7 +102,8 @@ pub async fn fetch_mods_page(
             lv.version_number AS latest_version,
             lv.game_versions,
             lv.loaders,
-            lv.download_url
+            lv.download_url,
+            (SELECT COUNT(*) FROM stars s WHERE s.mod_id = mods.id) AS stars_count
         FROM mods
         LEFT JOIN LATERAL (
             SELECT version_number, game_versions, loaders, download_url
@@ -136,7 +139,8 @@ pub async fn fetch_mods_page(
 
 pub async fn fetch_mod_by_slug(pool: &PgPool, slug: &str) -> Result<Option<ModRow>, sqlx::Error> {
     let row = sqlx::query_as::<_, ModRow>(
-        r#"SELECT id, slug, name, summary, owner, repo, icon_url, updated_at, created_at
+        r#"SELECT id, slug, name, summary, owner, repo, icon_url, updated_at, created_at,
+                  (SELECT COUNT(*) FROM stars s WHERE s.mod_id = mods.id) AS stars_count
            FROM mods WHERE slug = $1"#,
     )
     .bind(slug)

@@ -1,7 +1,7 @@
 # Indexium
 
 > Лёгкий, дешёвый и устойчивый к лимитам GitHub индексатор модов Minecraft.  
-> Бэкенд — **асинхронный событийный индексатор**: не хранит тяжёлые `.jar`, индексирует метаданные из GitHub Releases CDN и отдаёт быстрые JSON-ответы.
+> Бэкенд - **асинхронный событийный индексатор**: не хранит тяжёлые `.jar`, индексирует метаданные из GitHub Releases CDN и отдаёт быстрые JSON-ответы.
 
 ## Архитектура (TL;DR)
 
@@ -22,7 +22,7 @@ GitHub --webhook release.published--> Ingestion API (HMAC check) --> Redis Queue
 └── docker-compose.yml  # (WIP) Postgres + Redis
 ```
 
-Почему монорепо: см. [`docs/git-strategy.md`](docs/git-strategy.md) — один clone, атомарные изменения API+UI, один CI.
+Почему монорепо: см. [`docs/git-strategy.md`](docs/git-strategy.md) - один clone, атомарные изменения API+UI, один CI.
 
 ## Быстрый старт (локально)
 
@@ -58,12 +58,12 @@ bun run dev
 
 ## Документация
 
-- [`docs/architecture.md`](docs/architecture.md) — компоненты, lifecycle релиза, обход лимитов
-- [`docs/database-schema.md`](docs/database-schema.md) — схема БД + индексы
-- [`docs/api-spec.md`](docs/api-spec.md) — Public REST API v1
-- [`docs/deployment.md`](docs/deployment.md) — деплой, бэкапы
-- [`docs/git-strategy.md`](docs/git-strategy.md) — почему монорепо и как работать с ним
-- [`todo.md`](todo.md) — роадмап по фазам
+- [`docs/architecture.md`](docs/architecture.md) - компоненты, lifecycle релиза, обход лимитов
+- [`docs/database-schema.md`](docs/database-schema.md) - схема БД + индексы
+- [`docs/api-spec.md`](docs/api-spec.md) - Public REST API v1
+- [`docs/deployment.md`](docs/deployment.md) - деплой, бэкапы
+- [`docs/git-strategy.md`](docs/git-strategy.md) - почему монорепо и как работать с ним
+- [`todo.md`](todo.md) - роадмап по фазам
 
 ## Лицензия
 
@@ -71,4 +71,4 @@ TBD
 
 ## Контакты / Issues
 
-Используй GitHub Issues для багов и фич. Перед PR — `cargo fmt && cargo clippy`.
+Используй GitHub Issues для багов и фич. Перед PR - `cargo fmt && cargo clippy`.

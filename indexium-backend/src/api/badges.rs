@@ -53,7 +53,7 @@ fn badge_svg(label: &str, value: &str) -> String {
 
 fn simple_badge_svg(label: &str, value: &str) -> String {
     // fallback simple spec: <svg width="200" height="20"><rect...><text>label: value</text></svg>
-    // we embed both formats — simple text ensures spec match
+    // we embed both formats - simple text ensures spec match
     let combined = format!("{}: {}", label, value);
     // keep width 200 height 20 as required
     format!(
@@ -124,7 +124,7 @@ pub async fn get_downloads_badge(
     State(state): State<AppState>,
     Path(slug): Path<String>,
 ) -> impl IntoResponse {
-    // downloads tends to be larger — random 500..50000 if no DB row
+    // downloads tends to be larger - random 500..50000 if no DB row
     let raw = resolve_value(&state, &slug, 500, 50000, "downloads").await;
     // scale small version-count to look like downloads: * 1000 if <1000
     let scaled = if raw < 100 { raw * 1200 } else { raw };

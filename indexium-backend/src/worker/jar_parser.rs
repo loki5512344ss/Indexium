@@ -34,7 +34,7 @@ pub struct FabricModJson {
 }
 
 // ---------------------------------------------------------------------------
-// Async I/O — HTTP Range Requests
+// Async I/O - HTTP Range Requests
 // ---------------------------------------------------------------------------
 
 /// HEAD → (content_length, supports_range)
