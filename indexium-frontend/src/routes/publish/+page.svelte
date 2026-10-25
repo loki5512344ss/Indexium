@@ -60,6 +60,6 @@
 			<li>Paste <code class="mono">owner/repo</code> → we verify LICENSE + manifest</li>
 			<li>Install webhook → every release is indexed via Range-Request (no full download)</li>
 		</ol>
-		<p class="text-muted" style="margin:0;font-size:13px;">See <a href="/docs">docs</a> and <a href="https://github.com/loki5512344/Indexium" target="_blank">GitHub</a>.</p>
+		<p class="text-muted" style="margin:0;font-size:13px;">See <a href="/docs">docs</a> and <a href="https://github.com/loki5512344ss/Indexium" target="_blank">GitHub</a>.</p>
 	</div>
 </div>
